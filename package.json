@@ -1,0 +1,24 @@
+{
+  "name": "xolphin-api-js",
+  "version": "1.0.0",
+  "description": "Xolphin API JavaScript library",
+  "main": "./lib/xolphin.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xolphin/xolphin-api-js.git"
+  },
+  "author": "Xolphin <info@xolphin.nl>, "Roman Ragimoff <roma.ragimoff@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xolphin/xolphin-api-js/issues"
+  },
+  "homepage": "https://github.com/xolphin/xolphin-api-js#readme",
+  "dependencies": {
+    "async": "^1.5.2",
+    "request": "^2.69.0"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.10.0"
+  }
+}
