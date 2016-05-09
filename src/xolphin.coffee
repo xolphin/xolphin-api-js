@@ -136,6 +136,7 @@ class Client
       #proxy: 'http://127.0.0.1:8888/'
       headers:
         'Accept': 'application/json'
+        'User-Agent': 'xolphin-api-js/1.1'
 
     @baseUrl = "https://#{@username}:#{@password}@api.xolphin.com/v1/"
 
