@@ -1,5 +1,2 @@
-.idea
-xolphin-api-js.iml
-node_modules
-test.coffee
-/test.js
+node_modules/
+.idea/

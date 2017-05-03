@@ -41,7 +41,7 @@ client.request.all(function(err, requests){
 });
 ```
 
-### Getting request by ID
+#### Getting request by ID
 
 ```js
 client.request.get(961992625, function(err, request){
@@ -49,7 +49,7 @@ client.request.get(961992625, function(err, request){
 });
 ```
 
-### Request certificate
+#### Request certificate
 
 ```js
 var ccr = client.request.create(24, 1, '<csr_string>', "EMAIL");
@@ -60,6 +60,8 @@ ccr.approverPhone = "+12345678901";
 ccr.approverEmail = "email@domain.com";
 ccr.zipcode = "123456";
 ccr.city = "City";
+//currently available languages: en, de, fr, nl
+ccr.language = "en";
 ccr.company = "Company";
 ccr.subjectAlternativeNames.push("test1.domain.com");
 ccr.subjectAlternativeNames.push("test2.domain.com");
@@ -71,6 +73,52 @@ ccr.dcv.push({
 
 client.request.send(ccr, function(err, result) {
     console.log(err, result.id);
+});
+```
+
+#### Create a note
+
+```js
+client.request.sendNote(1234, 'My message',function(err, result){
+    console.log('Errors: '+err);
+    console.log('Message: '+result.message);
+});
+```
+
+#### Get list of notes
+
+```js
+client.request.getNotes(1234, function(err, result){
+    result.forEach(function(note){
+       console.log('Message: '+note.message);
+    });
+});
+```
+
+#### Send a "Comodo Subscriber Agreement" email
+
+```js
+//currently available languages: en, de, fr, nl
+client.request.sendComodoSAEmail(1234, 'mail@example.com', 'en', function(err, result){
+    console.log('Errors: '+err);
+    console.log('Message: '+result.message);
+});
+```
+
+#### Request an "Encryption Everywhere" certificate
+```js
+var request = client.request.createEE();
+request.csr = "<csr_string>"
+request.approverFirstName = "FirstName";
+request.approverLastName = "LastName";
+request.approverPhone = "+12345678901";
+request.approverEmail = "email@domain.com";
+request.validate = false;
+request.subjectAlternativeNames.push("test1.domain.com");
+request.subjectAlternativeNames.push("test2.domain.com");
+
+client.request.sendEE(request,function(err, result){
+    console.log(result);
 });
 ```
 
