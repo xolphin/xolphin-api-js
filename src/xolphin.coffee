@@ -31,6 +31,12 @@ class Request
   send: (request, callback) =>
     @client.post "requests", request.toArray(), callback
 
+  createEE: () ->
+    new requests.CreateEERequest() 
+
+  sendEE: (request, callback) ->
+    @client.post "requests/ee", request.toArray(), callback
+
   get: (id, callback) =>
     @client.get "requests/#{id}", {}, (err, result) =>
       callback err, result
@@ -51,8 +57,25 @@ class Request
   scheduleValidationCall: (id, dateTime, callback) =>
     @client.post "requests/#{id}/schedule-validation-call", {
       date: dateTime.toISOString().split('T')[0],
-      time: dateTime.toISOString().split('T')[1].split('.')[0],
+      time: dateTime.toISOString().split('T')[1].split('.')[0].substring(0,5),
     }, callback
+
+  getNotes: (id, callback) =>
+    @client.get "requests/#{id}/notes", {}, (err, result) =>
+      callback err, result._embedded.notes
+
+  sendNote: (id, note, callback) =>
+    @client.post "requests/#{id}/notes", {
+      message: note
+    }, (err, result) =>
+      callback err, result
+
+  sendComodoSAEmail: (id, to, lang, callback) =>
+    @client.post "requests/#{id}/sa", {
+      sa_email: to,
+      language: lang
+    }, (err, result) =>
+      callback err, result
 
 class Certificate
   constructor: (@client) ->
@@ -130,15 +153,20 @@ class Support
       callback err, result
 
 class Client
-  constructor: (@username, @password) ->
+  constructor: (@username, @password, @test) ->
     #process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
     @r = r.defaults
       #proxy: 'http://127.0.0.1:8888/'
       headers:
         'Accept': 'application/json'
         'User-Agent': 'xolphin-api-js/1.1'
+    
+    if @test
+      @env = "@xolphin-public-api.loc/v1/" 
+    else 
+      @env = "@api.xolphin.com/v1/"
 
-    @baseUrl = "https://#{@username}:#{@password}@api.xolphin.com/v1/"
+    @baseUrl = "https://#{@username}:#{@password}#{@env}"
 
     @support = new Support @
     @request = new Request @
@@ -148,12 +176,11 @@ class Client
     @r.get
       url: "#{@baseUrl}#{method}?#{querystring.stringify(data)}"
     , (e, r, b) =>
+        b = @_toObject b
         if e?
           callback true, e, b if typeof(callback) == 'function'
         else
           if 200 <= r.statusCode < 300
-            b = JSON.parse(b) if typeof(b) == 'string'
-
             if not b.hasOwnProperty('message') and not b.hasOwnProperty('errors')
               callback false, b, b if typeof(callback) == 'function'
             else
@@ -165,31 +192,38 @@ class Client
     @r.get
       url: "#{@baseUrl}#{method}?#{querystring.stringify(data)}"
     , (e, r, b) =>
-      if e?
-        callback true, e, b if typeof(callback) == 'function'
-      else
-        if 200 <= r.statusCode < 300
-          callback false, b, b if typeof(callback) == 'function'
+        b = @_toObject b
+        if e?
+          callback true, e, b if typeof(callback) == 'function'
         else
-          callback true, b, b if typeof(callback) == 'function'
+          if 200 <= r.statusCode < 300
+            callback false, b, b if typeof(callback) == 'function'
+          else
+            callback true, b, b if typeof(callback) == 'function'
 
   post: (method, data = {}, callback) =>
     @r.post
       url: "#{@baseUrl}#{method}",
       formData: data
     , (e, r, b) =>
+      b = @_toObject b
       if e?
         callback true, e, b if typeof(callback) == 'function'
       else
         if 200 <= r.statusCode < 300
-          b = JSON.parse(b) if typeof(b) == 'string'
-
           if not b.hasOwnProperty('errors')
             callback false, b, b if typeof(callback) == 'function'
           else
             callback true, b.message, b if typeof(callback) == 'function'
         else
           callback true, b, b if typeof(callback) == 'function'
+  _toObject: (json) =>
+    try
+      JSON.parse(json)
+    catch
+      return json
+    return JSON.parse(json)
+    
 
 module.exports =
   Client: Client

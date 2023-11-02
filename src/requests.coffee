@@ -13,6 +13,7 @@ class CreateCertificateRequest
     @approverPhone = ''
     @kvk = ''
     @reference = ''
+    @language = ''
 
   toArray: () =>
     result = {
@@ -35,6 +36,35 @@ class CreateCertificateRequest
     result['approverPhone'] = @approverPhone if @approverPhone != ''
     result['kvk'] = @kvk if @kvk != ''
     result['reference'] = @reference if @reference != ''
+    result['language'] = @language if @language != ''
+
+    result
+
+class CreateEERequest
+  constructor: () ->
+    @csr = ''
+    @subjectAlternativeNames = []
+    @approverFirstName = ''
+    @approverLastName = ''
+    @approverEmail = ''
+    @approverPhone = ''
+    @dcvType = 'FILE'
+    @validate = false
+
+  toArray: () =>
+    result = {}
+
+    result['subjectAlternativeNames'] = @subjectAlternativeNames.join(',') if @subjectAlternativeNames.length > 0
+    
+    result = {
+      csr: @csr,
+      approverFirstName: @approverFirstName,
+      approverLastName: @approverLastName,
+      approverEmail: @approverEmail,
+      approverPhone: @approverPhone,
+      dcvType: @dcvType,
+      validate: if @validate then 1 else 0
+    }
 
     result
 
@@ -53,6 +83,7 @@ class ReissueCertificateRequest
     @approverPhone = ''
     @kvk = ''
     @reference = ''
+    @language = ''
 
   toArray: () =>
     result = {
@@ -73,6 +104,7 @@ class ReissueCertificateRequest
     result['approverPhone'] = @approverPhone if @approverPhone != ''
     result['kvk'] = @kvk if @kvk != ''
     result['reference'] = @reference if @reference != ''
+    result['language'] = @language if @language != ''
 
     result
 
@@ -91,6 +123,7 @@ class RenewCertificateRequest
     @approverPhone = ''
     @kvk = ''
     @reference = ''
+    @language = ''
 
   toArray: () =>
     result = {
@@ -113,10 +146,12 @@ class RenewCertificateRequest
     result['approverPhone'] = @approverPhone if @approverPhone != ''
     result['kvk'] = @kvk if @kvk != ''
     result['reference'] = @reference if @reference != ''
+    result['language'] = @language if @language != ''
 
     result
 
 module.exports =
-  CreateCertificateRequest: CreateCertificateRequest
-  ReissueCertificateRequest: ReissueCertificateRequest
-  RenewCertificateRequest: RenewCertificateRequest
+  CreateCertificateRequest:   CreateCertificateRequest
+  CreateEERequest:            CreateEERequest,
+  ReissueCertificateRequest:  ReissueCertificateRequest
+  RenewCertificateRequest:    RenewCertificateRequest
