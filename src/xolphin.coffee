@@ -54,11 +54,20 @@ class Request
       email: email
     }, callback
 
-  scheduleValidationCall: (id, dateTime, callback) =>
-    @client.post "requests/#{id}/schedule-validation-call", {
+  scheduleValidationCall: (id, dateTime, timezone = "Europe/Amsterdam", callback, phoneNumber, extensionNumber, email, comments, action = "ScheduledCallback", language = "en_us") =>
+    request = {
       date: dateTime.toISOString().split('T')[0],
       time: dateTime.toISOString().split('T')[1].split('.')[0].substring(0,5),
-    }, callback
+      timezone: timezone
+    }
+    request['phoneNumber'] = phoneNumber if phoneNumber != null
+    request['extensionNumber'] = extensionNumber if extensionNumber != null
+    request['email'] = email if email != null
+    request['comments'] = comments if comments != null
+    request['action'] = action if action != 'ScheduledCallback'
+    request['language'] = language if language != 'en_us'
+
+    @client.post "requests/#{id}/schedule-validation-call", request, callback
 
   getNotes: (id, callback) =>
     @client.get "requests/#{id}/notes", {}, (err, result) =>
